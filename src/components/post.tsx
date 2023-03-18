@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { AiOutlineLike } from "react-icons/ai";
 
 const Post = ({ post }) => {
   return (
@@ -11,9 +12,10 @@ const Post = ({ post }) => {
           alt={post.user.name}
           height={48}
         />
-        <p className="pb-5 pt-1 text-xs pl-[13px]">{post.user.name}</p>
+        <p className="pb-5 pt-1 pl-[13px] text-xs">{post.user.name}</p>
       </div>
       <p>{post.text}</p>
+      <AiOutlineLike color="white" className="ml-auto" size={24} />
     </div>
   );
 };
