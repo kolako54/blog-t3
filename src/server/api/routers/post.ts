@@ -46,7 +46,8 @@ export const postRouter = createTRPCRouter({
       })
     )
     .query(({ ctx, input }) => {
-      const { prisma } = ctx;
+      const { prisma, session } = ctx;
+      const userId = session?.user?.id;
       const { where } = input;
       return prisma.post.findMany({
         where,
@@ -63,6 +64,63 @@ export const postRouter = createTRPCRouter({
               name: true,
               image: true,
             },
+          },
+          postLikes: {
+            where: {
+              userId,
+            },
+            select: {
+              userId: true,
+            },
+          },
+          // _count: {
+          //   select: {
+          //     postLikes: true,
+          //   },
+          // },
+        },
+      });
+    }),
+  like: protectedProcedure
+    .input(
+      z.object({
+        postId: z.string().optional(),
+      })
+    )
+    .mutation(({ ctx, input }) => {
+      const { prisma, session } = ctx;
+      const { id: userId } = session.user;
+      const { postId } = input;
+      return prisma.like.create({
+        data: {
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
+          post: {
+            connect: {
+              id: postId,
+            },
+          },
+        },
+      });
+    }),
+  unlike: protectedProcedure
+    .input(
+      z.object({
+        postId: z.string().optional(),
+      })
+    )
+    .mutation(({ ctx, input }) => {
+      const { prisma, session } = ctx;
+      const { id: userId } = session.user;
+      const { postId } = input;
+      return prisma.like.delete({
+        where: {
+          userId_postId: {
+            postId: postId,
+            userId: userId,
           },
         },
       });

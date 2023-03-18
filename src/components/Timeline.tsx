@@ -5,9 +5,6 @@ const Timeline = () => {
   const { data: posts } = api.postRoute.getPosts.useQuery({});
   console.log(posts);
 
-  const hey = posts?.map((post) => {
-    console.log(post);
-  });
   console.log("postsssss", posts);
   return (
     <div className=" m-auto flex w-min flex-col items-center">
