@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { string, z } from "zod";
 
 import {
@@ -131,13 +132,34 @@ export const postRouter = createTRPCRouter({
         postId: z.string(),
       })
     )
-    .mutation(({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       const { postId } = input;
-      const { prisma } = ctx;
-      return prisma.post.delete({
+      const { prisma, session } = ctx;
+      const userIdSession = session.user.id;
+      let users;
+      const singlePost = await prisma.post.findMany({
         where: {
+          userId: userIdSession,
           id: postId,
         },
+        select: {
+          userId: true,
+        },
       });
+      console.log("userdataaaa", singlePost);
+      // return userId.map(async (id, i) => {
+      if (singlePost && singlePost[0]?.userId === userIdSession) {
+        return await prisma.post.delete({
+          where: {
+            id: postId,
+          },
+        });
+      } else {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You can not delete others posts!",
+        });
+      }
+      // });
     }),
 });

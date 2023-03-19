@@ -45,11 +45,12 @@ const Post = ({ post }) => {
     },
   });
 
-  const { mutateAsync: deleteMutation } = api.postRoute.deletePost.useMutation({
-    onSuccess: () => {
-      utils.postRoute.getPosts.invalidate();
-    },
-  });
+  const { mutateAsync: deleteMutation, error } =
+    api.postRoute.deletePost.useMutation({
+      onSuccess: () => {
+        utils.postRoute.getPosts.invalidate();
+      },
+    });
   const { mutateAsync: unlikeMutation } = api.postRoute.unlike.useMutation({
     onSuccess: (data, variables, action = "unlike") => {
       //   useUpdaceCache({ data, variables, client: "like" });
@@ -62,16 +63,10 @@ const Post = ({ post }) => {
           },
         ],
         (oldData) => {
-          console.log("old dataaaaaaaaa", oldData);
           const prevData = oldData;
           const value = action === "like" ? 1 : -1;
-          console.log("actionnn", action);
           const newData = prevData.map((post) => {
             if (post.id === variables.postId) {
-              console.log(
-                "postttttttttttttttttttttttttttttttttttttttt",
-                data.userId
-              );
               return {
                 ...post,
                 postLikes: action === "like" ? [data.userId] : [],
@@ -83,7 +78,6 @@ const Post = ({ post }) => {
               return post;
             }
           });
-          console.log("NewDataa......", newData);
           return newData;
         }
       );
@@ -112,6 +106,7 @@ const Post = ({ post }) => {
       console.log(e.message);
     }
   };
+  console.log("errrrorrrrrr", error?.message);
   return (
     <div className="my-5 mx-5 w-[40rem] bg-primary p-5">
       <div className="flex flex-col">
@@ -125,7 +120,7 @@ const Post = ({ post }) => {
         <p className="pb-5 pt-1 pl-[13px] text-xs">{post.user.name}</p>
       </div>
       <p>{post.text}</p>
-      <div className="ml-auto flex flex-row-reverse">
+      <div className="ml-auto flex flex-row-reverse pt-5">
         <div className="flex flex-col items-center justify-center">
           {hasLiked ? (
             <AiTwotoneLike
