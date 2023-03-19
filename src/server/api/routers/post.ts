@@ -125,4 +125,19 @@ export const postRouter = createTRPCRouter({
         },
       });
     }),
+  deletePost: protectedProcedure
+    .input(
+      z.object({
+        postId: z.string(),
+      })
+    )
+    .mutation(({ ctx, input }) => {
+      const { postId } = input;
+      const { prisma } = ctx;
+      return prisma.post.delete({
+        where: {
+          id: postId,
+        },
+      });
+    }),
 });

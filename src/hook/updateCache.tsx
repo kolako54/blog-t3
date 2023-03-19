@@ -1,8 +1,9 @@
 import { useQueryClient } from "@tanstack/react-query";
 
-export const useUpdateCache = (data, variables, action = "like") => {
-    const queryClient = useQueryClient();
-    //   useUpdaceCache({ data, variables, client: "like" });
+export const useUpdateCache = ({ data, variables, action }) => {
+  console.log("usepdatecacheeeeee", data);
+  const queryClient = useQueryClient();
+  //   useUpdaceCache({ data, variables, client: "like" });
   queryClient.setQueryData(
     [
       ["postRoute", "getPosts"],

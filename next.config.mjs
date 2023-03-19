@@ -21,7 +21,7 @@ const config = {
     defaultLocale: "en",
   },
   images: {
-    domains: ["avatars.githubusercontent.com"],
+    domains: ["avatars.githubusercontent.com", "cloudflare-ipfs.com"],
   },
 };
 export default config;

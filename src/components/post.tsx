@@ -2,14 +2,16 @@ import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { AiOutlineLike, AiTwotoneLike } from "react-icons/ai";
 import { useUpdaceCache } from "~/hook/updateCache";
+import { BsTrash } from "react-icons/bs";
 import { api } from "~/utils/api";
 
 const Post = ({ post }) => {
   const queryClient = useQueryClient();
+  const utils = api.useContext();
   const hasLiked = post.postLikes.length > 0;
   const { mutateAsync: likeMutation } = api.postRoute.like.useMutation({
     onSuccess: (data, variables, action = "like") => {
-      //   useUpdaceCache({ data, variables, client: "like" });
+      // useUpdaceCache({ data, variables, action: "like" });
       queryClient.setQueryData(
         [
           ["postRoute", "getPosts"],
@@ -43,6 +45,11 @@ const Post = ({ post }) => {
     },
   });
 
+  const { mutateAsync: deleteMutation } = api.postRoute.deletePost.useMutation({
+    onSuccess: () => {
+      utils.postRoute.getPosts.invalidate();
+    },
+  });
   const { mutateAsync: unlikeMutation } = api.postRoute.unlike.useMutation({
     onSuccess: (data, variables, action = "unlike") => {
       //   useUpdaceCache({ data, variables, client: "like" });
@@ -98,6 +105,13 @@ const Post = ({ post }) => {
       console.log(e.message);
     }
   };
+  const handleDelete = async (postId) => {
+    try {
+      await deleteMutation({ postId });
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
   return (
     <div className="my-5 mx-5 w-[40rem] bg-primary p-5">
       <div className="flex flex-col">
@@ -111,23 +125,30 @@ const Post = ({ post }) => {
         <p className="pb-5 pt-1 pl-[13px] text-xs">{post.user.name}</p>
       </div>
       <p>{post.text}</p>
-      <div className="flex flex-col justify-center items-center">
-        {hasLiked ? (
-          <AiTwotoneLike
-            color="white"
-            className="ml-auto cursor-pointer"
-            size={24}
-            onClick={() => handleUnlike(post.id)}
-          />
-        ) : (
-          <AiOutlineLike
-            color="white"
-            className="ml-auto cursor-pointer"
-            size={24}
-            onClick={() => handleLike(post.id)}
-          />
-        )}
-        <p className="ml-auto pr-2 text-xs">{post._count.postLikes}</p>
+      <div className="ml-auto flex flex-row-reverse">
+        <div className="flex flex-col items-center justify-center">
+          {hasLiked ? (
+            <AiTwotoneLike
+              color="white"
+              className="ml-auto cursor-pointer"
+              size={24}
+              onClick={() => handleUnlike(post.id)}
+            />
+          ) : (
+            <AiOutlineLike
+              color="white"
+              className="ml-auto cursor-pointer"
+              size={24}
+              onClick={() => handleLike(post.id)}
+            />
+          )}
+          <p className="ml-auto pr-2 text-xs">{post._count.postLikes}</p>
+        </div>
+        <BsTrash
+          size={24}
+          className="mr-2 cursor-pointer"
+          onClick={() => handleDelete(post.id)}
+        />
       </div>
     </div>
   );
