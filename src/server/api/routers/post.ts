@@ -58,13 +58,6 @@ export const postRouter = createTRPCRouter({
         ],
 
         include: {
-          user: {
-            select: {
-              email: true,
-              name: true,
-              image: true,
-            },
-          },
           postLikes: {
             where: {
               userId,
@@ -73,11 +66,18 @@ export const postRouter = createTRPCRouter({
               userId: true,
             },
           },
-          // _count: {
-          //   select: {
-          //     postLikes: true,
-          //   },
-          // },
+          user: {
+            select: {
+              email: true,
+              name: true,
+              image: true,
+            },
+          },
+          _count: {
+            select: {
+              postLikes: true,
+            },
+          },
         },
       });
     }),
